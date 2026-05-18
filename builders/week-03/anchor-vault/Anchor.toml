@@ -1,0 +1,25 @@
+# Anchor workspace root. Run `anchor build` from this directory (not from `programs/`).
+#
+# If the build fails at "Building IDL" / `proc_macro2::Span::source_file` on a recent Rust
+# (Anchor 0.30.1 + rustc 1.95+), use:
+#   anchor build --no-idl
+# Or upgrade Anchor CLI and `anchor-lang` in Cargo.toml together (e.g. 0.31.1+).
+
+[toolchain]
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+anchorvault = "11111111111111111111111111111112"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "cargo test"

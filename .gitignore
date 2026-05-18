@@ -1,1 +1,29 @@
+# Rust / Anchor build artifacts
 **/target/
+**/*.rs.bk
+
+# Anchor
+**/.anchor/
+**/test-ledger/
+**/.surfpool/
+
+# Node / TypeScript
+**/node_modules/
+**/.yarn/
+**/dist/
+**/build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+
+# Secrets / env (never commit wallets or env files)
+.env
+.env.*
+**/*-keypair.json
+
+# Logs
+*.log
