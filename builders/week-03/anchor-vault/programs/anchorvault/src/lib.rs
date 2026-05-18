@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 declare_id!("11111111111111111111111111111112");
 
 mod instructions;
-mod state;
+pub mod state;
 
 use instructions::*;
 

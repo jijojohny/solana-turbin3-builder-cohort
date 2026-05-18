@@ -13,7 +13,7 @@ pub struct Withdraw<'info> {
         seeds = [b"vault", vault_state.key().as_ref()],
         bump = vault_state.vault_bump,
     )]
-    pub vault: SystemAccount<'info>,
+    pub vault: UncheckedAccount<'info>,
 
     #[account(
         mut,
