@@ -74,7 +74,7 @@ pub struct Deposit<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(
+pub fn deposit_handler(
     ctx: Context<Deposit>,
     amount_a: u64,
     amount_b: u64,

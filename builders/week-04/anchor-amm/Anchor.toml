@@ -12,7 +12,11 @@ anchor_amm = "C8T9ag7c88ERNyVv2VujXejVZrWTrc164bPoJTYYjoLp"
 cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
+[surfpool]
+startup_wait = 5000
+shutdown_wait = 2000
+
 [scripts]
-test = "cargo test"
+test = "cargo test -p anchor-amm --test amm --test amm_failures"
 
 [hooks]

@@ -1,3 +1,6 @@
+//! Shared LiteSVM helpers for integration tests.
+#![allow(dead_code)]
+
 use anchor_amm::constants::{LP_MINT_SEED, POOL_SEED};
 use anchor_lang::{InstructionData, ToAccountMetas};
 use litesvm::LiteSVM;

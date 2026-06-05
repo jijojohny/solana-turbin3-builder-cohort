@@ -27,7 +27,7 @@ pub mod anchor_amm {
         amount_b: u64,
         min_lp_out: u64,
     ) -> Result<()> {
-        instructions::deposit::handler(ctx, amount_a, amount_b, min_lp_out)
+        instructions::deposit::deposit_handler(ctx, amount_a, amount_b, min_lp_out)
     }
 
     pub fn withdraw(
@@ -36,7 +36,7 @@ pub mod anchor_amm {
         min_amount_a: u64,
         min_amount_b: u64,
     ) -> Result<()> {
-        instructions::withdraw::handler(ctx, lp_amount, min_amount_a, min_amount_b)
+        instructions::withdraw::withdraw_handler(ctx, lp_amount, min_amount_a, min_amount_b)
     }
 
     pub fn swap_a_for_b(ctx: Context<Swap>, amount_in: u64, min_amount_out: u64) -> Result<()> {

@@ -68,7 +68,7 @@ pub struct Withdraw<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn handler(
+pub fn withdraw_handler(
     ctx: Context<Withdraw>,
     lp_amount: u64,
     min_amount_a: u64,
