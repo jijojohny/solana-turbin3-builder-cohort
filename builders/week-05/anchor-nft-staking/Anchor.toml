@@ -1,0 +1,22 @@
+[toolchain]
+package_manager = "yarn"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+nft_staking = "9FAFuiroTiq89GaxGpYTVDQq1AbD3whjLpvWB43uhGGZ"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[surfpool]
+startup_wait = 5000
+shutdown_wait = 2000
+
+[scripts]
+test = "cargo test -p nft-staking --test staking --test staking_failures"
+
+[hooks]
