@@ -1,0 +1,48 @@
+[package]
+name = "nft-marketplace"
+version = "0.1.0"
+description = "Metaplex Core NFT marketplace with SOL/SPL payments and offers"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "nft_marketplace"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+anchor-debug = []
+custom-heap = []
+custom-panic = []
+
+[dependencies]
+anchor-lang = { version = "1.0.1", features = ["init-if-needed"] }
+anchor-spl = { version = "1.0.1", features = ["associated_token", "token"] }
+mpl-core = { version = "0.12.0", default-features = false, features = ["borsh-v1"] }
+
+[dev-dependencies]
+borsh = "1.5"
+num-traits = "0.2"
+mpl-core = { version = "0.12.0", default-features = false, features = ["borsh-v1"] }
+solana-program = "3.0.0"
+litesvm = "0.10.0"
+solana-account = "3.4.0"
+solana-clock = "3.0.0"
+solana-instruction = "3.4.0"
+solana-keypair = "3.0.1"
+solana-message = "3.0.1"
+solana-program-option = "3.0.0"
+solana-program-pack = "3.0.0"
+solana-pubkey = "3.0.0"
+solana-signer = "3.0.0"
+solana-system-interface = "2.0.0"
+solana-transaction = "3.0.2"
+spl-associated-token-account-interface = "2.0.0"
+spl-token-interface = "2.0.0"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }
