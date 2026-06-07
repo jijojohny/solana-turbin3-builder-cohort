@@ -1,8 +1,9 @@
-use crate::constants::{MARKETPLACE_SEED, OFFER_SEED};
+use crate::constants::{MARKETPLACE_SEED, OFFER_SEED, OFFER_VAULT_SEED};
 use crate::state::{Marketplace, Offer};
 use crate::utils::{load_asset, pay_sol_from_pda, transfer_asset_to_buyer};
 use crate::MarketplaceError;
 use anchor_lang::prelude::*;
+use anchor_lang::system_program::{transfer, Transfer};
 use mpl_core::ID as CORE_PROGRAM_ID;
 
 #[derive(Accounts)]
@@ -10,9 +11,8 @@ pub struct AcceptOffer<'info> {
     #[account(mut)]
     pub maker: Signer<'info>,
 
-    /// CHECK: buyer receives the asset
     #[account(mut, address = offer.buyer)]
-    pub buyer: UncheckedAccount<'info>,
+    pub buyer: Signer<'info>,
 
     #[account(
         seeds = [MARKETPLACE_SEED],
@@ -42,6 +42,14 @@ pub struct AcceptOffer<'info> {
     )]
     pub offer: Account<'info, Offer>,
 
+    #[account(
+        mut,
+        seeds = [OFFER_VAULT_SEED, asset.key().as_ref(), buyer.key().as_ref()],
+        bump,
+    )]
+    /// CHECK: SOL escrow vault
+    pub offer_vault: UncheckedAccount<'info>,
+
     pub system_program: Program<'info, System>,
 
     #[account(address = CORE_PROGRAM_ID)]
@@ -58,16 +66,18 @@ pub fn handler(ctx: Context<AcceptOffer>) -> Result<()> {
 
     let offer = &ctx.accounts.offer;
     let asset_key = ctx.accounts.asset.key();
-    let offer_seeds = &[
-        OFFER_SEED,
+    let buyer_key = ctx.accounts.buyer.key();
+    let vault_bump = ctx.bumps.offer_vault;
+    let vault_seeds = &[
+        OFFER_VAULT_SEED,
         asset_key.as_ref(),
-        offer.buyer.as_ref(),
-        &[offer.bump],
+        buyer_key.as_ref(),
+        &[vault_bump],
     ];
-    let signer = &[&offer_seeds[..]];
+    let signer = &[&vault_seeds[..]];
 
     pay_sol_from_pda(
-        &ctx.accounts.offer.to_account_info(),
+        &ctx.accounts.offer_vault.to_account_info(),
         &ctx.accounts.maker.to_account_info(),
         &ctx.accounts.treasury.to_account_info(),
         &ctx.accounts.system_program.to_account_info(),
@@ -75,6 +85,21 @@ pub fn handler(ctx: Context<AcceptOffer>) -> Result<()> {
         ctx.accounts.marketplace.fee_bps,
         signer,
     )?;
+
+    let vault_rent = ctx.accounts.offer_vault.lamports();
+    if vault_rent > 0 {
+        transfer(
+            CpiContext::new_with_signer(
+                ctx.accounts.system_program.to_account_info().key(),
+                Transfer {
+                    from: ctx.accounts.offer_vault.to_account_info(),
+                    to: ctx.accounts.buyer.to_account_info(),
+                },
+                signer,
+            ),
+            vault_rent,
+        )?;
+    }
 
     transfer_asset_to_buyer(
         &ctx.accounts.asset.to_account_info(),

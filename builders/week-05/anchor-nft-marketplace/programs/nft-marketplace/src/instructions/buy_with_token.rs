@@ -50,7 +50,7 @@ pub struct BuyWithToken<'info> {
         address = listing.payment_mint,
         mint::token_program = token_program,
     )]
-    pub payment_mint: InterfaceAccount<'info, Mint>,
+    pub payment_mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         mut,
@@ -58,7 +58,7 @@ pub struct BuyWithToken<'info> {
         associated_token::authority = buyer,
         associated_token::token_program = token_program,
     )]
-    pub buyer_payment_ata: InterfaceAccount<'info, TokenAccount>,
+    pub buyer_payment_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
@@ -67,7 +67,7 @@ pub struct BuyWithToken<'info> {
         associated_token::authority = maker,
         associated_token::token_program = token_program,
     )]
-    pub maker_payment_ata: InterfaceAccount<'info, TokenAccount>,
+    pub maker_payment_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
@@ -76,7 +76,7 @@ pub struct BuyWithToken<'info> {
         associated_token::authority = treasury,
         associated_token::token_program = token_program,
     )]
-    pub treasury_payment_ata: InterfaceAccount<'info, TokenAccount>,
+    pub treasury_payment_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,

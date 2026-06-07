@@ -41,13 +41,23 @@ pub struct Delist<'info> {
 }
 
 pub fn handler(ctx: Context<Delist>) -> Result<()> {
+    let listing = &ctx.accounts.listing;
+    let asset_key = ctx.accounts.asset.key();
+    let listing_seeds = &[
+        LISTING_SEED,
+        asset_key.as_ref(),
+        &[listing.bump],
+    ];
+    let signer = &[&listing_seeds[..]];
+
     revoke_listing_delegate(
         &ctx.accounts.asset.to_account_info(),
         &ctx.accounts.collection.to_account_info(),
         &ctx.accounts.maker.to_account_info(),
-        &ctx.accounts.maker.to_account_info(),
+        &ctx.accounts.listing.to_account_info(),
         &ctx.accounts.core_program.to_account_info(),
         &ctx.accounts.system_program.to_account_info(),
+        signer,
     )?;
 
     remove_transfer_delegate(

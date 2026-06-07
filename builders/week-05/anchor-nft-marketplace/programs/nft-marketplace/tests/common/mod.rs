@@ -10,9 +10,11 @@ use mpl_core::{
     ID as CORE_PROGRAM_ID,
 };
 use nft_marketplace::{
-    constants::{LISTING_SEED, MARKETPLACE_SEED, NATIVE_MINT, OFFER_SEED},
+    constants::{LISTING_SEED, MARKETPLACE_SEED, OFFER_SEED, OFFER_VAULT_SEED},
     state::{Listing, Marketplace},
 };
+
+pub use nft_marketplace::constants::NATIVE_MINT;
 use solana_account::Account;
 use solana_instruction::{AccountMeta, Instruction};
 use solana_keypair::Keypair;
@@ -120,6 +122,14 @@ pub fn offer_pda(asset: &Pubkey, buyer: &Pubkey) -> Pubkey {
     .0
 }
 
+pub fn offer_vault_pda(asset: &Pubkey, buyer: &Pubkey) -> Pubkey {
+    Pubkey::find_program_address(
+        &[OFFER_VAULT_SEED, asset.as_ref(), buyer.as_ref()],
+        &nft_marketplace::ID,
+    )
+    .0
+}
+
 pub fn ata(owner: &Pubkey, mint: &Pubkey) -> Pubkey {
     get_associated_token_address(owner, mint)
 }
@@ -130,6 +140,15 @@ pub fn lamports(svm: &LiteSVM, address: Pubkey) -> u64 {
 
 pub fn token_balance(svm: &LiteSVM, address: Pubkey) -> u64 {
     let account = svm.get_account(&address).expect("token account missing");
+    TokenAccount::unpack(&account.data)
+        .expect("invalid token account")
+        .amount
+}
+
+pub fn token_balance_or_zero(svm: &LiteSVM, address: Pubkey) -> u64 {
+    let Some(account) = svm.get_account(&address) else {
+        return 0;
+    };
     TokenAccount::unpack(&account.data)
         .expect("invalid token account")
         .amount
@@ -351,6 +370,7 @@ pub fn make_offer_ix(buyer: Pubkey, asset: Pubkey, amount: u64) -> Instruction {
         marketplace: marketplace_pda(),
         asset,
         offer: offer_pda(&asset, &buyer),
+        offer_vault: offer_vault_pda(&asset, &buyer),
         system_program: SYSTEM_PROGRAM_ID,
     };
     Instruction {
@@ -375,6 +395,7 @@ pub fn accept_offer_ix(
         asset,
         collection,
         offer: offer_pda(&asset, &buyer),
+        offer_vault: offer_vault_pda(&asset, &buyer),
         system_program: SYSTEM_PROGRAM_ID,
         core_program: MPL_CORE,
     };
@@ -390,6 +411,7 @@ pub fn cancel_offer_ix(buyer: Pubkey, asset: Pubkey) -> Instruction {
         buyer,
         asset,
         offer: offer_pda(&asset, &buyer),
+        offer_vault: offer_vault_pda(&asset, &buyer),
         system_program: SYSTEM_PROGRAM_ID,
     };
     Instruction {

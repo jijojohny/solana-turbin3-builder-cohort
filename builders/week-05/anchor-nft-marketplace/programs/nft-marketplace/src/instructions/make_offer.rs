@@ -78,7 +78,7 @@ pub fn handler(ctx: Context<MakeOffer>, amount: u64) -> Result<()> {
             ),
             Rent::get()?.minimum_balance(0),
             0,
-            &crate::ID,
+            &anchor_lang::system_program::ID,
         )?;
     }
 

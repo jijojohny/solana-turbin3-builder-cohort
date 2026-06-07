@@ -92,8 +92,8 @@ fn test_buy_with_token() {
     let treasury_ata = ata(&setup.treasury.pubkey(), &setup.payment_mint.pubkey());
     let buyer_ata = ata(&setup.buyer.pubkey(), &setup.payment_mint.pubkey());
 
-    let maker_before = token_balance(&svm, maker_ata);
-    let treasury_before = token_balance(&svm, treasury_ata);
+    let maker_before = token_balance_or_zero(&svm, maker_ata);
+    let treasury_before = token_balance_or_zero(&svm, treasury_ata);
     let buyer_before = token_balance(&svm, buyer_ata);
     let (maker_share, fee) = split_payment(LIST_PRICE_TOKEN, FEE_BPS);
 

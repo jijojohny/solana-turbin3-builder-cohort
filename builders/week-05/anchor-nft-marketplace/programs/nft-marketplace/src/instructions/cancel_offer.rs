@@ -1,6 +1,7 @@
 use crate::constants::{OFFER_SEED, OFFER_VAULT_SEED};
 use crate::state::Offer;
 use anchor_lang::prelude::*;
+use anchor_lang::system_program::{transfer, Transfer};
 
 #[derive(Accounts)]
 pub struct CancelOffer<'info> {
@@ -33,9 +34,31 @@ pub struct CancelOffer<'info> {
 
 pub fn handler(ctx: Context<CancelOffer>) -> Result<()> {
     let vault_lamports = ctx.accounts.offer_vault.lamports();
-    if vault_lamports > 0 {
-        ctx.accounts.offer_vault.sub_lamports(vault_lamports)?;
-        ctx.accounts.buyer.add_lamports(vault_lamports)?;
+    if vault_lamports == 0 {
+        return Ok(());
     }
+
+    let asset_key = ctx.accounts.asset.key();
+    let buyer_key = ctx.accounts.buyer.key();
+    let vault_bump = ctx.bumps.offer_vault;
+    let vault_seeds = &[
+        OFFER_VAULT_SEED,
+        asset_key.as_ref(),
+        buyer_key.as_ref(),
+        &[vault_bump],
+    ];
+    let signer = &[&vault_seeds[..]];
+
+    transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.system_program.to_account_info().key(),
+            Transfer {
+                from: ctx.accounts.offer_vault.to_account_info(),
+                to: ctx.accounts.buyer.to_account_info(),
+            },
+            signer,
+        ),
+        vault_lamports,
+    )?;
     Ok(())
 }
