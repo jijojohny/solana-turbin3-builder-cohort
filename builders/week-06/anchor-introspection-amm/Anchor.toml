@@ -1,0 +1,22 @@
+[toolchain]
+package_manager = "yarn"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+introspection_amm = "2QMKjmtkFRnDQJihz9DEnNBFGoUqEXqXc1kQBVjrvmyB"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[surfpool]
+startup_wait = 5000
+shutdown_wait = 2000
+
+[scripts]
+test = "cargo test -p introspection-amm --test amm --test amm_failures"
+
+[hooks]
